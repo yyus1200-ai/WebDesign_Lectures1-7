@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>網頁設計 1-7 講：問答題背誦專區</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #eef2ff;
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 90px;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    h1 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .nav-link-btn {
+      background: #f1f5f9;
+      color: #334155;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .nav-link-btn:hover { background: #e2e8f0; }
+
+    .container { max-width: 960px; margin: 22px auto; padding: 0 20px; }
+
+    .dashboard-card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .search-input {
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      flex: 1;
+      min-width: 220px;
+      background: white;
+    }
+    .search-input:focus { border-color: var(--primary); outline: none; }
+
+    .pill-btn {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill-btn:hover { background: #f1f5f9; color: var(--text); }
+    .pill-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: 600; }
+
+    .action-btn {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .action-btn:hover { background: #f8fafc; color: var(--text); }
+
+    .essay-card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 22px 24px;
+      margin-bottom: 18px;
+      transition: box-shadow 0.2s;
+    }
+    .essay-card:hover { box-shadow: var(--shadow-hover); }
+    .essay-card.open .toggle-arrow { transform: rotate(180deg); }
+    .essay-header {
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .tag-lec { background: var(--primary-light); color: var(--primary); font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+    .tag-type { background: #e0f2fe; color: #0369a1; font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+    .tag-num { background: #f1f5f9; color: #475569; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; }
+
+    .essay-title { font-size: 1.12rem; font-weight: 700; color: #0f172a; line-height: 1.5; }
+    .toggle-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .essay-body {
+      display: none;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+      animation: fadeIn 0.2s ease;
+    }
+    .essay-card.open .essay-body { display: block; }
+    .ans-box-essay {
+      background: #f8fafc;
+      border-left: 4px solid var(--primary);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.98rem;
+      color: #334155;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>💡 網頁設計 問答題與簡述背誦專區</h1>
+    <a href="網頁設計_1-7講_選擇題測驗與錯題本.html" class="nav-link-btn">👉 切換至：選擇題測驗與錯題本</a>
+  </div>
+</header>
+
+<div class="container">
+  <div class="dashboard-card">
+    <div>
+      <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:4px;">簡述題與實作題背誦</h2>
+      <div style="font-size:0.85rem; color:var(--text-muted);">
+        收錄第 1 至 7 講全部簡述題（7–8 題）與實作題（第 9 題），共 21 題。
+      </div>
+    </div>
+    <div>
+      <button class="action-btn" onclick="toggleAllEssay()">展開 / 折疊全部答案</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="filter-bar">
+      <input type="text" id="essay-search" class="search-input" placeholder="🔍 搜尋問答題關鍵字（如：業務需求、核心恐懼、峰終定律、菜單工程）..." oninput="filterEssay()">
+    </div>
+    <div class="filter-bar">
+      <span style="font-size:0.85rem; font-weight:700; color:var(--text);">題型：</span>
+      <button class="pill-btn active" onclick="setEssayType('all', this)">全部 (21)</button>
+      <button class="pill-btn" onclick="setEssayType('簡述題', this)">簡述題 (14)</button>
+      <button class="pill-btn" onclick="setEssayType('實作題', this)">實作題 (7)</button>
+
+      <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-left:10px;">講次：</span>
+      <button class="pill-btn active" onclick="setEssayLecture('all', this)">全部講次</button>
+      <button class="pill-btn" onclick="setEssayLecture('第一講 咖啡廳網站', this)">第 1 講</button>
+      <button class="pill-btn" onclick="setEssayLecture('第二講 健身房網站', this)">第 2 講</button>
+      <button class="pill-btn" onclick="setEssayLecture('第三講 攝影師作品集', this)">第 3 講</button>
+      <button class="pill-btn" onclick="setEssayLecture('第四講 診所預約網站', this)">第 4 講</button>
+      <button class="pill-btn" onclick="setEssayLecture('第五講 美容院會員網站', this)">第 5 講</button>
+      <button class="pill-btn" onclick="setEssayLecture('第六講 法律事務所網站', this)">第 6 講</button>
+      <button class="pill-btn" onclick="setEssayLecture('第七講 餐廳訂位網站', this)">第 7 講</button>
+    </div>
+  </div>
+
+  <div id="essay-container"></div>
+</div>
+
+<script>
+  const essayData = [
+    // --- 第一講 ---
+    {
+      id: "e1", lecture: "第一講 咖啡廳網站", type: "簡述題", qNum: 7,
+      question: "咖啡廳網站要解決的四個業務需求是什麼？請簡述每一項的意思。",
+      answer: `咖啡廳網站要解決四個業務需求：
+(一) 讓客人找得到：用清楚的地點、特色、菜單、營業時間，讓搜尋引擎與 Google 商家能理解這家店，客人搜附近咖啡廳時容易被找到。
+(二) 讓客人判斷得快：手機上耐心短，首頁前幾秒就要回答「賣什麼、在哪裡、適不適合我」，不要一開始塞品牌故事。
+(三) 讓客人信任：把自家烘焙、友善工作、寵物友善等特色化為具體證據（照片、菜單、真實地址），不作假。
+(四) 讓客人行動：提供查看菜單、撥打電話、開啟導航、預約座位等明確下一步，成為從搜尋到店的轉換橋樑。`
+    },
+    {
+      id: "e2", lecture: "第一講 咖啡廳網站", type: "簡述題", qNum: 8,
+      question: "請說明為什麼網站文案「可以包裝，但不能偽裝」，並各舉一個例子。",
+      answer: `「可以包裝，但不能偽裝」指網站可用設計與文字凸顯真實優點，但不能宣稱不存在的事實。
+• 包裝（可以）：店家確實自家烘焙，就把「每日小批自家烘焙」放首頁配烘豆照片，強化真實賣點。
+• 偽裝（不可以）：沒得過獎卻寫「冠軍咖啡師」；沒媒體採訪卻放「媒體爭相報導」。被識破後連真實內容也會失去信賴。AI 產出的漂亮假文案必須手動刪除。`
+    },
+    {
+      id: "e3", lecture: "第一講 咖啡廳網站", type: "實作題", qNum: 9,
+      question: "請產出咖啡廳 index.html，檢查首頁/菜單/營業資訊，記錄兩處修改點與操作句。",
+      answer: `實作評分看三件事：
+(1) 完成手機寬度檢驗首頁、菜單、營業資訊。
+(2) 記錄具體問題（如：手機版價格字體過小、電話無法點擊直接撥打）。
+(3) 修改句具備可操作性（如：「將電話加上 tel 連結，地址加上 Google Maps 導航連結，按鈕高度加大至 44px」）。`
+    },
+
+    // --- 第二講 ---
+    {
+      id: "e4", lecture: "第二講 健身房網站", type: "簡述題", qNum: 7,
+      question: "健身房客人在付費前心裡有「三個核心恐懼」，請列出並說明網站如何回應。",
+      answer: `健身房客人付費前之三個核心恐懼：
+(一) 體型標籤羞恥感：怕被評判。網站多放明亮空間、不同體態真實學員與器材教學圖解，傳達「歡迎初學者」。
+(二) 合約綁架：怕簽約退不掉。將月繳、無合約、隨時停止、冷靜期與退費條款放在首頁顯眼處說明清楚。
+(三) 能力不足挫折感：怕動作錯誤或被推銷。網站提供具體「無壓力體驗流程」與「不強迫推銷承諾」回應。`
+    },
+    {
+      id: "e5", lecture: "第二講 健身房網站", type: "簡述題", qNum: 8,
+      question: "請任選兩種「信任底線」剝削手法（預售滾動式騙局 / 超額贈送扣除法），說明其心理機制與破壞後果。",
+      answer: `• 預售滾動式騙局：新店開幕前以超低月費大規模吸金卻不公布開幕日，利用「折扣誘惑＋損失規避」；一旦資金鏈斷裂即倒閉，摧毀整個產業信任。
+• 解約陷阱超額贈送扣除法：買一年送三個月包裝成優惠，解約時卻依原價扣抵贈送月份的高額差價，變成套牢工具；利用「框架效應」，識破後造成信任徹底破裂。`
+    },
+    {
+      id: "e6", lecture: "第二講 健身房網站", type: "實作題", qNum: 9,
+      question: "產出健身房 index.html，檢查適合對象說明、私教課包有效期限與無療效保證文案。",
+      answer: `實作評分重點：
+(1) 檢查首頁是否消除體態焦慮，明確說明適合對象。
+(2) 私教課包明確標註堂數、有效期限與請假扣課規則。
+(3) 補充品與文案避免「三個月練出馬甲線」等不實療效保證。`
+    },
+
+    // --- 第三講 ---
+    {
+      id: "e7", lecture: "第三講 攝影師作品集", type: "簡述題", qNum: 7,
+      question: "攝影師作品集網站要解決的五件事是什麼？請簡述每一項的意思。",
+      answer: `攝影師作品集網站需解決的五件事：
+(一) 快速看懂風格：短時間內展現攝影師擅長主題與穩定質感。
+(二) 作品分類明確：婚紗、人像、活動分流呈現，符合不同客戶情境。
+(三) 搜尋引擎能理解：建立良好結構與文字標籤以獲得 Google 索引。
+(四) 信任資訊集中：拍攝流程、費用價格、交件時程公開透明。
+(五) 可持續維護：採用容易更新的部署架構，不讓網站建好即荒廢。`
+    },
+    {
+      id: "e8", lecture: "第三講 攝影師作品集", type: "簡述題", qNum: 8,
+      question: "說明 GitHub 與 Vercel 的角色分工，以及為何 commit 後需觀察 Vercel 自動部署？",
+      answer: `• GitHub：版本控制系統，負責存檔網站代碼與歷次有說明的 commit 紀錄，是「代碼版本庫」。
+• Vercel：偵測 GitHub 主分支更新，自動將代碼構建並部署為線上網址，是「正式上線平台」。
+• 觀察部署理由：親眼驗證自動化連動是否順利完成，避免因大小寫路徑錯誤或構建失敗導致線上網站未更新。`
+    },
+    {
+      id: "e9", lecture: "第三講 攝影師作品集", type: "實作題", qNum: 9,
+      question: "產出攝影師作品集 index.html，放入三個分類，完成 GitHub commit 與 Vercel 部署上線。",
+      answer: `實作評分重點：
+(1) 建立完整線上生命線（本地代碼 → GitHub Repo → Vercel 上線）。
+(2) 排查手機版破圖（確認檔案名稱大小寫完全吻合）。
+(3) 修改首頁文字後 commit，確認正式網址已自動更新。`
+    },
+
+    // --- 第四講 ---
+    {
+      id: "e10", lecture: "第四講 診所預約網站", type: "簡述題", qNum: 7,
+      question: "任選診所核心商業邏輯「健保漏斗」「採購聯盟議價」「回診率」其中兩條說明其意義。",
+      answer: `• 健保漏斗：健保門診是建立醫病信任的入口，自費項目是利潤出口，中間仰賴細心診療形成的信賴感轉化。
+• 採購聯盟議價：小診所結盟採購藥品耗材以換取議價空間，在維持醫療品質前提下降低成本。
+• 回診率：維繫老病患成本遠低於開發新病患，醫師用心記住既有症狀的問候，價值遠勝行銷廣告。`
+    },
+    {
+      id: "e11", lecture: "第四講 診所預約網站", type: "簡述題", qNum: 8,
+      question: "醫療網站文案需避開的三種語氣是什麼？各舉一個反面例子。",
+      answer: `• 保證療效：宣稱必然治癒（例：「保證根治、一次見效」），違反醫療法規。
+• 恐嚇式自費引導：利用恐懼壓迫病患買單（例：「不自費做這項檢查可能會後悔一輩子」）。
+• 模糊授權：將就醫照護與促銷活動綁定（例：「勾選即同意接收本院最新優惠與推廣訊息」）。`
+    },
+    {
+      id: "e12", lecture: "第四講 診所預約網站", type: "實作題", qNum: 9,
+      question: "產出診所預約網站，檢查時段名額狀態、停診與額滿分開呈現、複診提醒無混入行銷授權。",
+      answer: `實作評分重點：
+(1) 預約時段額滿時應正確反灰並禁止選取。
+(2) 停診原因與額滿狀態清楚分流標示。
+(3) 複診提醒同意條款嚴格限定於本次醫療照護，無夾帶促銷推廣。`
+    },
+
+    // --- 第五講 ---
+    {
+      id: "e13", lecture: "第五講 美容院會員網站", type: "簡述題", qNum: 7,
+      question: "寫出美容院客人的三個核心恐懼，並搭配網站上的具體做法回應。",
+      answer: `• 高壓推銷的情緒勒索：標明「無推銷保證，美容師無業績制度，療程中不進行推銷對話」。
+• 產品成分黑箱：公開保養品品牌來源、檢驗標章與技師證照。
+• 隱私洩露與環境不安：透明公開入店、更衣到諮詢之全程流程，讓體驗時間明確可預期。`
+    },
+    {
+      id: "e14", lecture: "第五講 美容院會員網站", type: "簡述題", qNum: 8,
+      question: "為什麼預約狀態要細分（待確認→已確認→已到店→已完成），沒有區分會造成什麼錯誤？",
+      answer: `細分狀態是為了準確反映服務進度並正確觸發帳務扣款。
+若未區分會造成錯誤：
+(1) 客人取消後系統誤判完成而發放點數；
+(2) 客人未到店卻被扣除儲值金或記帳，引發嚴重消費爭議。`
+    },
+    {
+      id: "e15", lecture: "第五講 美容院會員網站", type: "實作題", qNum: 9,
+      question: "產出美容院會員網站原型，驗收個資同意、點數流水帳、儲值來源、預約狀態區分。",
+      answer: `實作評分重點：
+(1) 註冊具有獨立個資同意授權勾選。
+(2) 會員中心具備明細完整的點數增減流水帳。
+(3) 預約管理列表中能清楚區分「已確認、已取消、未到店、已完成」等狀態。`
+    },
+
+    // --- 第六講 ---
+    {
+      id: "e16", lecture: "第六講 法律事務所網站", type: "簡述題", qNum: 7,
+      question: "當事人上律師官網時心裡的三個核心恐懼為何？各用一句話說明。",
+      answer: `• 費用黑洞：收費項目不透明，擔憂打贏官司卻賠付巨額律師費。
+• 專業傲慢疏離感：生硬法條缺乏白話溝通，感覺僅被當作程序處理而非被同理關照。
+• 敗訴後名譽崩解：擔心判決書公開留下永久污名，且懷疑是否律師未全力以赴。`
+    },
+    {
+      id: "e17", lecture: "第六講 法律事務所網站", type: "簡述題", qNum: 8,
+      question: "寫出法律網站標示的三個委任邊界，為什麼標示清楚反而能建立信任？",
+      answer: `三條委任邊界：
+(1) 閱讀網站內容不構成委任關係；
+(2) 送出初談表單不代表已被本所接受委任；
+(3) 正式法律意見須在了解完整案件事實後方得提供。
+建立信任原因：清楚界定邊界展現事務所的嚴謹與合規，必須先完成利益衝突審查才接案，證明律師守規可靠而非冷漠。`
+    },
+    {
+      id: "e18", lecture: "第六講 法律事務所網站", type: "實作題", qNum: 9,
+      question: "產出法律事務所網站，檢查初談表單是否收集對造關係人以支援利益衝突檢查，並聲明表單不代表委任關係。",
+      answer: `實作評分重點：
+(1) 初談表單包含「對造或關係人名稱」以供利益衝突排查。
+(2) 明確聲明「送出表單不代表本所已接受委任，需經衝突檢核後另行確認」。`
+    },
+
+    // --- 第七講 ---
+    {
+      id: "e19", lecture: "第七講 餐廳訂位網站", type: "簡述題", qNum: 7,
+      question: "簡述菜單工程、中央廚房預製化、全時段經營的意義與反映到網站上的決策。",
+      answer: `• 菜單工程：依人氣與毛利率規劃版面；網站將招牌明星菜色放於首頁黃金版位引導點餐。
+• 預製化（標準化）：工序移至央廚以確保出餐穩定度；網站可放心對外承諾高品質與快速供餐。
+• 全時段經營：填補離峰空檔；網站規劃下午茶獨立訂位入口吸引彈性客群。`
+    },
+    {
+      id: "e20", lecture: "第七講 餐廳訂位網站", type: "簡述題", qNum: 8,
+      question: "為什麼明明還剩 4 個座位卻不一定能接一組 4 人客？請說明系統容量檢查流程。",
+      answer: `原因：座位是以「桌型」為調度單位，剩餘 4 位若為兩張不可併的雙人桌，無法接待 4 人客。
+檢查流程：使用者選擇日期、時段與人數 → 系統檢索可容納該人數之桌型（TableType）→ 扣除該時段已確認訂位 → 判斷是否有空桌可供預約。`
+    },
+    {
+      id: "e21", lecture: "第七講 餐廳訂位網站", type: "實作題", qNum: 9,
+      question: "產出餐廳訂位網站原型，檢查人數與桌型對應、額滿時段不可點、訂位編號與取消方式標記。",
+      answer: `實作評分重點：
+(1) 選擇 4 人時桌型篩選器不應允許分配只能坐 2 人的散桌。
+(2) 額滿時段明確禁止點擊。
+(3) 送出成功後給予正式訂位代碼與保留時間及取消規則說明。`
+    }
+  ];
+
+  let essayLectureFilter = 'all';
+  let essayTypeFilter = 'all';
+  let essaySearchQuery = '';
+  let allEssayExpanded = false;
+
+  function getFilteredEssayData() {
+    return essayData.filter(e => {
+      const matchLec = essayLectureFilter === 'all' || e.lecture === essayLectureFilter;
+      const matchT = essayTypeFilter === 'all' || e.type === essayTypeFilter;
+      let matchQ = true;
+      if (essaySearchQuery) {
+        const query = essaySearchQuery.toLowerCase();
+        const text = (e.lecture + e.question + e.answer).toLowerCase();
+        matchQ = text.includes(query);
+      }
+      return matchLec && matchT && matchQ;
+    });
+  }
+
+  function renderEssayList() {
+    const container = document.getElementById('essay-container');
+    const items = getFilteredEssayData();
+
+    if (items.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:50px 20px; color:var(--text-muted); background:white; border-radius:14px; border:1px solid var(--border);">
+          🎯 沒有符合條件的問答題目。
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = items.map(e => {
+      return `
+        <div class="essay-card ${allEssayExpanded ? 'open' : ''}" id="essay-${e.id}">
+          <div class="essay-header" onclick="toggleEssay('${e.id}')">
+            <div style="flex:1;">
+              <div class="q-meta">
+                <span class="tag-lec">${e.lecture}</span>
+                <span class="tag-type">${e.type}</span>
+                <span class="tag-num">第 ${e.qNum} 題</span>
+              </div>
+              <div class="essay-title">${e.qNum}. ${e.question}</div>
+            </div>
+            <div class="toggle-arrow">▼</div>
+          </div>
+          <div class="essay-body">
+            <div class="ans-box-essay">
+              <strong style="color:var(--primary); font-size:1.02rem;">【標準答案與要點整理】</strong><br>
+              ${e.answer}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function toggleEssay(id) {
+    const el = document.getElementById(`essay-${id}`);
+    if (el) el.classList.toggle('open');
+  }
+
+  function toggleAllEssay() {
+    allEssayExpanded = !allEssayExpanded;
+    document.querySelectorAll('.essay-card').forEach(c => {
+      if (allEssayExpanded) c.classList.add('open');
+      else c.classList.remove('open');
+    });
+  }
+
+  function setEssayLecture(lec, btn) {
+    essayLectureFilter = lec;
+    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderEssayList();
+  }
+
+  function setEssayType(t, btn) {
+    essayTypeFilter = t;
+    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderEssayList();
+  }
+
+  function filterEssay() {
+    essaySearchQuery = document.getElementById('essay-search').value.trim();
+    renderEssayList();
+  }
+
+  renderEssayList();
+</script>
+</body>
+</html>

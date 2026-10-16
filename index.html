@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>網頁設計 1-7 講：選擇題測驗與錯題本</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #eef2ff;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 90px;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    h1 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .nav-link-btn {
+      background: #f1f5f9;
+      color: #334155;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .nav-link-btn:hover { background: #e2e8f0; }
+
+    .container { max-width: 960px; margin: 22px auto; padding: 0 20px; }
+
+    .dashboard-card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .stat-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .stat-pill {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .stat-pill strong { color: var(--text); font-size: 1rem; margin-left: 4px; }
+    .stat-pill.wrong { border-color: #fca5a5; background: #fff5f5; color: var(--danger); }
+    .stat-pill.wrong strong { color: var(--danger); }
+    .stat-pill.accuracy { border-color: #86efac; background: #f0fdf4; color: #15803d; }
+    .stat-pill.accuracy strong { color: #15803d; }
+
+    .controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .search-input {
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      flex: 1;
+      min-width: 220px;
+      background: white;
+    }
+    .search-input:focus { border-color: var(--primary); outline: none; }
+
+    .pill-btn {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill-btn:hover { background: #f1f5f9; color: var(--text); }
+    .pill-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: 600; }
+    .pill-btn.wrong-filter { border-color: #fca5a5; color: var(--danger); background: #fff5f5; font-weight: 600; }
+    .pill-btn.wrong-filter.active { background: var(--danger); color: white; border-color: var(--danger); }
+
+    .action-btn {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .action-btn:hover { background: #f8fafc; color: var(--text); }
+
+    .quiz-card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 22px 24px;
+      margin-bottom: 18px;
+      transition: box-shadow 0.2s;
+    }
+    .quiz-card:hover { box-shadow: var(--shadow-hover); }
+    .quiz-card.answered-wrong { border-left: 5px solid var(--danger); }
+    .quiz-card.answered-correct { border-left: 5px solid var(--success); }
+    .q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .tag-lec { background: var(--primary-light); color: var(--primary); font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+    .tag-type { background: #e0f2fe; color: #0369a1; font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+    .tag-num { background: #f1f5f9; color: #475569; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; }
+    .tag-wrong-badge { background: var(--danger-light); color: var(--danger); font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px; display: none; }
+    .quiz-card.is-in-wrongbook .tag-wrong-badge { display: inline-block; }
+
+    .q-text { font-size: 1.12rem; font-weight: 700; color: #0f172a; line-height: 1.5; margin-bottom: 16px; }
+    .options-grid { display: flex; flex-direction: column; gap: 10px; }
+    .opt-btn {
+      width: 100%;
+      text-align: left;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.98rem;
+      color: #334155;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.15s ease;
+      line-height: 1.45;
+    }
+    .opt-btn:hover:not(.disabled) { background: #f1f5f9; border-color: #cbd5e1; }
+    .opt-btn .opt-badge {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: #475569;
+    }
+    .opt-btn.correct { background: #ecfdf5 !important; border-color: #34d399 !important; color: #065f46 !important; font-weight: 600; }
+    .opt-btn.correct .opt-badge { background: var(--success); color: white; border-color: var(--success); }
+    .opt-btn.wrong-picked { background: #fef2f2 !important; border-color: #f87171 !important; color: #991b1b !important; font-weight: 600; }
+    .opt-btn.wrong-picked .opt-badge { background: var(--danger); color: white; border-color: var(--danger); }
+    .opt-btn.disabled { cursor: default; }
+
+    .feedback-box {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+    .feedback-box.correct { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+    .feedback-box.wrong { background: #fff1f2; border: 1px solid #fecdd3; color: #9f1239; }
+    .fb-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+    .fb-analysis {
+      font-size: 0.93rem;
+      color: #334155;
+      line-height: 1.6;
+      margin-top: 6px;
+      background: rgba(255,255,255,0.7);
+      padding: 10px 12px;
+      border-radius: 6px;
+      white-space: pre-line;
+    }
+    .q-footer-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 14px; }
+    .retry-btn { font-size: 0.8rem; background: transparent; border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; cursor: pointer; color: var(--text-muted); }
+    .retry-btn:hover { background: #f1f5f9; color: var(--text); }
+    .remove-wrong-btn { font-size: 0.8rem; background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>📝 網頁設計 選擇題測驗與錯題本</h1>
+    <a href="網頁設計_1-7講_問答題背誦專區.html" class="nav-link-btn">👉 切換至：問答題背誦專區</a>
+  </div>
+</header>
+
+<div class="container">
+  <div class="dashboard-card">
+    <div>
+      <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:4px;">作答統計與錯題本</h2>
+      <div style="font-size:0.85rem; color:var(--text-muted);">
+        點選選項即時批改並解析，答錯自動收集至錯題本！
+      </div>
+    </div>
+    <div class="stat-group">
+      <div class="stat-pill">已作答 <strong id="stat-answered">0</strong> / 42</div>
+      <div class="stat-pill accuracy">正確率 <strong id="stat-accuracy">0%</strong></div>
+      <div class="stat-pill wrong">錯題數 <strong id="stat-wrong-count">0</strong></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="filter-bar">
+      <input type="text" id="quiz-search" class="search-input" placeholder="🔍 搜尋選擇題關鍵字（如：Vibe Coding、信任三支柱、定價模型）..." oninput="filterQuiz()">
+      <button class="action-btn" onclick="resetQuizProgress()">重置作答記錄</button>
+    </div>
+
+    <div class="filter-bar">
+      <span style="font-size:0.85rem; font-weight:700; color:var(--text);">錯題專區：</span>
+      <button class="pill-btn wrong-filter" id="btn-wrongbook-toggle" onclick="toggleWrongbookOnly()">
+        📕 只看錯題本 (<span id="wrong-filter-num">0</span>)
+      </button>
+
+      <span style="font-size:0.85rem; font-weight:700; color:var(--text); margin-left:8px;">題型：</span>
+      <button class="pill-btn active" onclick="setQuizType('all', this)">全部 (42)</button>
+      <button class="pill-btn" onclick="setQuizType('選擇題', this)">選擇題 (28)</button>
+      <button class="pill-btn" onclick="setQuizType('是非題', this)">是非題 (14)</button>
+    </div>
+
+    <div class="filter-bar">
+      <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">講次：</span>
+      <button class="pill-btn active" onclick="setQuizLecture('all', this)">全部講次</button>
+      <button class="pill-btn" onclick="setQuizLecture('第一講 咖啡廳網站', this)">第 1 講</button>
+      <button class="pill-btn" onclick="setQuizLecture('第二講 健身房網站', this)">第 2 講</button>
+      <button class="pill-btn" onclick="setQuizLecture('第三講 攝影師作品集', this)">第 3 講</button>
+      <button class="pill-btn" onclick="setQuizLecture('第四講 診所預約網站', this)">第 4 講</button>
+      <button class="pill-btn" onclick="setQuizLecture('第五講 美容院會員網站', this)">第 5 講</button>
+      <button class="pill-btn" onclick="setQuizLecture('第六講 法律事務所網站', this)">第 6 講</button>
+      <button class="pill-btn" onclick="setQuizLecture('第七講 餐廳訂位網站', this)">第 7 講</button>
+    </div>
+  </div>
+
+  <div id="quiz-container"></div>
+</div>
+
+<script>
+  const quizData = [
+    // --- 第一講 咖啡廳網站 ---
+    {
+      id: "q1", lecture: "第一講 咖啡廳網站", type: "選擇題", qNum: 1,
+      question: "一位想找地方帶筆電工作的客人點進咖啡廳網站，最希望在前幾秒看到的是下列何者？",
+      options: [
+        { key: "(1)", text: "老闆的創業故事與得獎記錄" },
+        { key: "(2)", text: "座位、插座、Wi-Fi 與是否限時" },
+        { key: "(3)", text: "大量甜點特寫與打卡牆" },
+        { key: "(4)", text: "完整的咖啡豆烘焙曲線圖" }
+      ],
+      answerKey: "(2)",
+      analysis: `手機上的客人耐心很短，工作型客人最關心「我能不能在這裡安心坐下來工作」。座位、插座、Wi-Fi 與是否限時是他做決定的關鍵資訊。(1)(4) 是進一步才看的內容，(3) 是打卡客的需求。網站的第一任務是替客人降低進門前的不確定感。`
+    },
+    {
+      id: "q2", lecture: "第一講 咖啡廳網站", type: "選擇題", qNum: 2,
+      question: "本講教的「Vibe Coding」，最貼切的描述是下列何者？",
+      options: [
+        { key: "(1)", text: "自己一行一行手寫 HTML 與 CSS" },
+        { key: "(2)", text: "用自然語言把需求說清楚，讓 AI 工具直接幫你把網站做出來" },
+        { key: "(3)", text: "直接購買現成的網站模板套用" },
+        { key: "(4)", text: "請工程師代為開發後台系統" }
+      ],
+      answerKey: "(2)",
+      analysis: `Vibe Coding 是用自然語言把需求講清楚、讓 AI 工具直接幫你把網站做出來，而不是自己一行一行刻程式。(1) 是傳統手刻；(3) 是套模板；(4) 是外包。重點在於先學會把需求說清楚。`
+    },
+    {
+      id: "q3", lecture: "第一講 咖啡廳網站", type: "選擇題", qNum: 3,
+      question: "關於咖啡廳網站的「信任模組」，下列敘述何者正確？",
+      options: [
+        { key: "(1)", text: "沒有媒體報導也可以先寫「媒體推薦」吸引客人" },
+        { key: "(2)", text: "模糊的「環境舒適、咖啡好喝」比具體資訊更有說服力" },
+        { key: "(3)", text: "店名、地址、電話、營業時間等可驗證資訊能降低到店前的不確定感" },
+        { key: "(4)", text: "AI 產出的文案不需檢查，直接上線即可" }
+      ],
+      answerKey: "(3)",
+      analysis: `信任模組的原則是「具體、可驗證、不編造」。店名、地址、電話、營業時間是客人到店前最需要的確認資訊。(1) 沒報導就寫是偽裝；(2) 模糊形容詞幫助有限；(4) AI 產出文案必須親自查核拉回現實。`
+    },
+    {
+      id: "q4", lecture: "第一講 咖啡廳網站", type: "選擇題", qNum: 4,
+      question: "下列何者最適合作為咖啡廳網站手機版的設計重點？",
+      options: [
+        { key: "(1)", text: "把桌機版整頁等比例縮小塞進手機" },
+        { key: "(2)", text: "地址可點開導航、電話可直接撥打、按鈕夠大" },
+        { key: "(3)", text: "加入大量動畫讓畫面更吸睛" },
+        { key: "(4)", text: "隱藏菜單與營業資訊以保持版面乾淨" }
+      ],
+      answerKey: "(2)",
+      analysis: `咖啡廳訪客多數在路上用手機查詢，地址可開導航、電話可一鍵撥打、按鈕夠大是手機版核心重點。(1) 縮小會難以閱讀；(3) 動畫拖慢載入；(4) 隱藏關鍵資訊會提高放棄率。`
+    },
+    {
+      id: "q5", lecture: "第一講 咖啡廳網站", type: "是非題", qNum: 5,
+      question: "同一家咖啡廳可以服務很多種客人，所以網站應該同時對工作客、約會客、買豆客講一樣的話，才不會漏掉任何人。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(X)",
+      analysis: `同一家店不能同時對所有人講一樣的話，否則訊息失焦誰都打動不了。正確做法是先判斷最想服務誰，再用照片與排版對準客群核心需求。`
+    },
+    {
+      id: "q6", lecture: "第一講 咖啡廳網站", type: "是非題", qNum: 6,
+      question: "在 Vibe Coding 的工作流裡，學生不需要先背熟所有 HTML 語法，而是先學會把「要做什麼」說清楚。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(O)",
+      analysis: `Vibe Coding 把學習重心移到「把需求說清楚」，讓 AI 產出第一版，再逐步看懂結構並驗收，而非死記硬背標籤語法。`
+    },
+
+    // --- 第二講 健身房網站 ---
+    {
+      id: "q7", lecture: "第二講 健身房網站", type: "選擇題", qNum: 1,
+      question: "一位被自己久坐後的小腹嚇到、半夜在捷運上點開健身房頁面的客人，本講認為他付費那一刻真正買的是下列何者？",
+      options: [
+        { key: "(1)", text: "最新的進口器材與寬敞場地" },
+        { key: "(2)", text: "一張「我已經不是那個放棄自己的人」的心理收據" },
+        { key: "(3)", text: "教練的國際證照與得獎記錄" },
+        { key: "(4)", text: "三個月保證練出的完美線條" }
+      ],
+      answerKey: "(2)",
+      analysis: `健身房賣的是「心理補償收據」。那位客人被現在的自己嚇到，刷卡那一秒大腦分泌多巴胺暫時逃離焦慮，付費買的是心理撫慰，不是器材或證照。`
+    },
+    {
+      id: "q8", lecture: "第二講 健身房網站", type: "選擇題", qNum: 2,
+      question: "本講提到健身房的定價模型，老手最在意的數字是下列何者？",
+      options: [
+        { key: "(1)", text: "讓出席率盡量接近百分之百" },
+        { key: "(2)", text: "月均出席率不要突破約百分之二十五，以保住「不運動稅」毛利" },
+        { key: "(3)", text: "每天進場人數愈多愈好" },
+        { key: "(4)", text: "簽下的私教課單數愈多愈好" }
+      ],
+      answerKey: "(2)",
+      analysis: `健身房商業模型建立在「八成五會員準時繳費卻不常來」的假設上，這筆「不運動稅」才是毛利核心。出席率一旦突破 25%，營運成本便會侵蝕利潤。`
+    },
+    {
+      id: "q9", lecture: "第二講 健身房網站", type: "選擇題", qNum: 3,
+      question: "依本講「信任三支柱」模型（資歷、善意、誠信），下列哪一個網站區塊最主要對應「誠信」這個維度？",
+      options: [
+        { key: "(1)", text: "教練的認證資歷與專長介紹" },
+        { key: "(2)", text: "不同體態學員的真實改造前後見證" },
+        { key: "(3)", text: "完整透明的退費與終止條款，且承諾無隱藏費用" },
+        { key: "(4)", text: "場館的高規格器材與環境照片" }
+      ],
+      answerKey: "(3)",
+      analysis: `信任三支柱：資歷（Ability）、善意（Benevolence）、誠信（Integrity）。「退費條款透明且說到做到」即對應誠信維度；(1) 為資歷，(2) 為善意。`
+    },
+    {
+      id: "q10", lecture: "第二講 健身房網站", type: "選擇題", qNum: 4,
+      question: "關於健身房網站裡的「課程包耗課記錄」（LessonLedger），下列敘述何者最正確？",
+      options: [
+        { key: "(1)", text: "只要寫出「20 堂優惠價」即可，堂數細節會讓客人卻步" },
+        { key: "(2)", text: "要清楚呈現購買堂數、已上堂數、剩餘堂數與到期日，透明本身就是信任模組" },
+        { key: "(3)", text: "耗課記錄是後台會計用的，不該出現在面向客人的網站需求裡" },
+        { key: "(4)", text: "把有效期限隱藏起來，客人比較不會擔心被綁約" }
+      ],
+      answerKey: "(2)",
+      analysis: `LessonLedger 耗課流水帳需清楚交代購買堂數、已上幾堂、剩幾堂、到期日與請假補課規則。透明公開才能解除客人對合約綁架的恐懼。`
+    },
+    {
+      id: "q11", lecture: "第二講 健身房網站", type: "是非題", qNum: 5,
+      question: "健身房廣告之所以常說「來體驗就好、不一定要加入」，是因為只要讓客人產生「我有健康選項了」的感覺，行銷目的就已達成，並不需要客人真的天天來報到。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(O)",
+      analysis: `這門生意靠八成以上幾乎不來的會員支撐，廣告目標是讓你產生心理慰藉並願意持續付費，不需要真的天天來擠爆場館。`
+    },
+    {
+      id: "q12", lecture: "第二講 健身房網站", type: "是非題", qNum: 6,
+      question: "私教課的預收費用，在課程實際上完之前，在會計上應視為「待履行負債」而不是「已實現營收」，所以老手看的是耗課率而非簽單量。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(O)",
+      analysis: `預收學費在實際上課完成前是尚未履行的勞務負債。新手教練看簽單量，老手看耗課率（Burn Rate），未消化課程是潛在財務風險。`
+    },
+
+    // --- 第三講 攝影師作品集 ---
+    {
+      id: "q13", lecture: "第三講 攝影師作品集", type: "選擇題", qNum: 1,
+      question: "一位準新娘搜尋「臺中婚紗攝影」後點進作品集網站，相較於只刷 Instagram，網站最能幫她做到下列何者？",
+      options: [
+        { key: "(1)", text: "看到攝影師每天的限時動態與生活近況" },
+        { key: "(2)", text: "在短時間內看懂風格、找到分類作品與方案價格，快速判斷適不適合自己" },
+        { key: "(3)", text: "即時私訊攝影師聊天" },
+        { key: "(4)", text: "累積按讚數與粉絲數" }
+      ],
+      answerKey: "(2)",
+      analysis: `社群動態是流動時間軸，資訊分散；作品集網站如同整理完善的工作室，讓訪客 5 分鐘內清楚看懂風格、分類精選作品與價格方案。`
+    },
+    {
+      id: "q14", lecture: "第三講 攝影師作品集", type: "選擇題", qNum: 2,
+      question: "本講要求把攝影師作品集推進成正式網站，下列哪一條才是本講教的完整流程？",
+      options: [
+        { key: "(1)", text: "AI 生成 → 直接把檔案寄給客人看" },
+        { key: "(2)", text: "AI 生成 → 本機檢查 → GitHub 保存 → Vercel 部署 → 手機驗收 → 持續更新" },
+        { key: "(3)", text: "AI 生成 → 印出來貼在工作室牆上" },
+        { key: "(4)", text: "AI 生成 → 上傳到 Instagram 限時動態" }
+      ],
+      answerKey: "(2)",
+      analysis: `完整的工程生命週期：AI 初版生成 → 本機排查 → GitHub 版本控制保存 → Vercel 自動化持續部署 → 手機驗收 → 隨時 commit 持續維護。`
+    },
+    {
+      id: "q15", lecture: "第三講 攝影師作品集", type: "選擇題", qNum: 3,
+      question: "關於攝影師作品集的「首頁第一屏」，下列敘述何者正確？",
+      options: [
+        { key: "(1)", text: "第一屏應放滿兩百張作品，讓客人一次看個夠" },
+        { key: "(2)", text: "「用光影記錄生命中最美好的瞬間」這種句子比有地點與服務類型的說明更實用" },
+        { key: "(3)", text: "第一屏應同時回答「你拍什麼類型、你的風格是什麼、我可以怎麼聯絡或看方案」三件事" },
+        { key: "(4)", text: "為了乾淨，首頁不需要放任何按鈕" }
+      ],
+      answerKey: "(3)",
+      analysis: `首頁第一屏需在數秒內交代核心三件事：服務類型、風格定位、明確下一步（查看作品/檔期預約）。空洞文藝字句遠不及明確資訊實用。`
+    },
+    {
+      id: "q16", lecture: "第三講 攝影師作品集", type: "選擇題", qNum: 4,
+      question: "部署上線後，作品集「本機打開正常、線上卻看不到照片」最常見的原因是下列何者？",
+      options: [
+        { key: "(1)", text: "客人的網路太慢" },
+        { key: "(2)", text: "圖片路徑錯、檔名大小寫不一致，或圖片檔根本沒上傳到 repository" },
+        { key: "(3)", text: "Vercel 一定要付費才會顯示圖片" },
+        { key: "(4)", text: "Instagram 沒有同步" }
+      ],
+      answerKey: "(2)",
+      analysis: `線上伺服器（Linux 環境）嚴格區分大小寫，或本地檔案未加入 git commit 導致線上缺少資源，是部署破圖最常見原因。`
+    },
+    {
+      id: "q17", lecture: "第三講 攝影師作品集", type: "是非題", qNum: 5,
+      question: "AI 生成攝影師網站時自動補上「服務過上百組新人」「獲得多項國際獎項」等文字，只要看起來專業，就算不是事實也可以直接保留上線。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(X)",
+      analysis: `編造獲獎與假好評是致命的信任破口。一旦被識破，連真實的作品也會被視為造假，必須刪除虛構文案。`
+    },
+    {
+      id: "q18", lecture: "第三講 攝影師作品集", type: "是非題", qNum: 6,
+      question: "commit message 只是寫給工程師看的技術術語，攝影師本人完全用不到，所以隨便寫什麼都沒差。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(X)",
+      analysis: `commit message 是自己網站修改歷史的備忘錄（如改價位、換封面照片），每次詳細記錄便於日後回顧與追蹤維護。`
+    },
+
+    // --- 第四講 診所預約網站 ---
+    {
+      id: "q19", lecture: "第四講 診所預約網站", type: "選擇題", qNum: 1,
+      question: "上班族在手機上搜尋「附近耳鼻喉科」，點進診所網站時，心裡真正判斷的最主要是下列何者？",
+      options: [
+        { key: "(1)", text: "哪一家診所的醫師醫術排名最高" },
+        { key: "(2)", text: "哪一家裝潢最豪華、照片最華麗" },
+        { key: "(3)", text: "哪一位醫師不會讓我覺得自己只是被快速處理掉的號碼" },
+        { key: "(4)", text: "哪一家的健保點數申報量最大" }
+      ],
+      answerKey: "(3)",
+      analysis: `病患無從客觀評價醫術，真正渴求的是「被認真對待」的心理感受與安心感，避免被當成流水號草率打發。`
+    },
+    {
+      id: "q20", lecture: "第四講 診所預約網站", type: "選擇題", qNum: 2,
+      question: "本講把診所生意拆成「健保漏斗」來理解，健保門診最主要的功能是下列何者？",
+      options: [
+        { key: "(1)", text: "衝高每月健保點數，讓帳面收入最大化" },
+        { key: "(2)", text: "做為建立病患信任的入口，讓部分病患日後願意轉向高單價自費項目" },
+        { key: "(3)", text: "取代自費項目，成為診所唯一的利潤來源" },
+        { key: "(4)", text: "用來吸引同業合作分潤" }
+      ],
+      answerKey: "(2)",
+      analysis: `健保漏斗：健保是入口、自費是出口，中間走廊是信任積累。病患感受到專業細心後，未來有需求才會轉化至高單價自費服務。`
+    },
+    {
+      id: "q21", lecture: "第四講 診所預約網站", type: "選擇題", qNum: 3,
+      question: "依「權威效應」的心理學錨點，挑選診所網站醫師簡介照片下列何者最適當？",
+      options: [
+        { key: "(1)", text: "醫師在海邊度假的生活照，凸顯親切感" },
+        { key: "(2)", text: "醫師穿白袍、在診間裡的專業形象照" },
+        { key: "(3)", text: "只放診所招牌與門口，不放醫師本人" },
+        { key: "(4)", text: "用免費圖庫的外國模特兒充當醫師" }
+      ],
+      answerKey: "(2)",
+      analysis: `面對醫療專業時，病患尋求的是權威信任。白袍與診間照能給予具體專業投射；度假生活照會削弱權威感。`
+    },
+    {
+      id: "q22", lecture: "第四講 診所預約網站", type: "選擇題", qNum: 4,
+      question: "關於診所預約網站的「診次容量與預約衝突」，下列敘述何者正確？",
+      options: [
+        { key: "(1)", text: "診次和一般行事曆事件一樣，只要知道某個時間有沒有空就夠了" },
+        { key: "(2)", text: "每個時段都不該設名額上限，先搶先贏對病患最公平" },
+        { key: "(3)", text: "一個時段要能標明是哪種診、誰看診、最多收幾人、是否保留現場掛號名額" },
+        { key: "(4)", text: "額滿和停診是同一件事，網站上用同一個標籤表示即可" }
+      ],
+      answerKey: "(3)",
+      analysis: `診次具備複雜屬性（醫師、科別、名額上限、現場號保留）；額滿（預約達上限）與停診（休診）性質不同，需清楚分開呈現。`
+    },
+    {
+      id: "q23", lecture: "第四講 診所預約網站", type: "是非題", qNum: 5,
+      question: "複診提醒可以提高回診率，所以網站上把「複診提醒」和「接收本診所最新療程優惠」綁在同一個勾選裡，一次取得授權最有效率。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(X)",
+      analysis: `這屬於模糊授權與行銷綁架。複診提醒是照護延伸，不可強制夾帶行銷推廣，否則將傷害醫病信任。`
+    },
+    {
+      id: "q24", lecture: "第四講 診所預約網站", type: "是非題", qNum: 6,
+      question: "依本講的觀點，醫療是一種「信心財」，病患要的常常不只是那顆藥，還有一個權威而清晰的說明，焦慮被緩解本身就是讓病患願意回來的根本原因之一。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(O)",
+      analysis: `醫療本質為信心財。清晰肯定的說明能有效撫平焦慮，情緒與心理緩解本身即是關鍵療效。`
+    },
+
+    // --- 第五講 美容院會員網站 ---
+    {
+      id: "q25", lecture: "第五講 美容院會員網站", type: "選擇題", qNum: 1,
+      question: "客人下班後搜尋「預約制美容」，點進網站時最希望先確認的是下列何者？",
+      options: [
+        { key: "(1)", text: "這家店的療程用的是哪一個國際大牌儀器" },
+        { key: "(2)", text: "她去了之後會不會在脆弱狀態下被逼著辦卡或升級" },
+        { key: "(3)", text: "老闆的創業故事與分店數量" },
+        { key: "(4)", text: "網站首頁的動畫與配色夠不夠時尚" }
+      ],
+      answerKey: "(2)",
+      analysis: `美容顧客處於卸妝、敷臉的脆弱狀態，最害怕強迫推銷與人情勒索。網站需優先打消客人的推銷疑慮。`
+    },
+    {
+      id: "q26", lecture: "第五講 美容院會員網站", type: "選擇題", qNum: 2,
+      question: "本講提到的「儲值卡 Breakage」（死帳利潤），最貼切的描述是下列何者？",
+      options: [
+        { key: "(1)", text: "客人刷卡消費時店家給的折扣回饋" },
+        { key: "(2)", text: "儲值金額中因遺失、過期或未使用而從未被兌換的部分" },
+        { key: "(3)", text: "美容院為了促銷而支出的廣告費用" },
+        { key: "(4)", text: "美容師每月的銷售業績獎金" }
+      ],
+      answerKey: "(2)",
+      analysis: `Breakage 指儲值卡因遺失、過期或未消費而沉澱的金額（約佔一成以上），店家不需付出任何服務成本即可轉為純利。`
+    },
+    {
+      id: "q27", lecture: "第五講 美容院會員網站", type: "選擇題", qNum: 3,
+      question: "本講要求點數與儲值金都要記成「流水帳」，主要理由為何？",
+      options: [
+        { key: "(1)", text: "流水帳比較好看，可以讓網站顯得專業" },
+        { key: "(2)", text: "流水帳能讓客人問「我的點數怎麼少了」時，回頭查到每一次增加、扣除、到期與退款" },
+        { key: "(3)", text: "法律規定所有網站都必須使用流水帳" },
+        { key: "(4)", text: "只存總數會讓資料庫的檔案太大" }
+      ],
+      answerKey: "(2)",
+      analysis: `流水帳旨在「可回查、防爭議」。每筆點數與餘額異動清清楚楚，是建立會員資金安全感的底層防線。`
+    },
+    {
+      id: "q28", lecture: "第五講 美容院會員網站", type: "選擇題", qNum: 4,
+      question: "依 CTA 設計原則，下列何者最適合作為初次造訪客人的主要行動安排？",
+      options: [
+        { key: "(1)", text: "首頁只放一個又大又顯眼的「立即儲值 8,888」按鈕" },
+        { key: "(2)", text: "讓第一次來的客人先看作品與價格，再決定是否預約，不一開始就逼她儲值" },
+        { key: "(3)", text: "隱藏服務價格，等客人加 LINE 私訊才報價" },
+        { key: "(4)", text: "在頁面各處重複彈出「今天辦卡最划算」的視窗" }
+      ],
+      answerKey: "(2)",
+      analysis: `新客心防最高，一開始逼儲值只會引發防備退縮；應以公開透明的作品與單次體驗促成初次行動。`
+    },
+    {
+      id: "q29", lecture: "第五講 美容院會員網站", type: "是非題", qNum: 5,
+      question: "讓資深美容師也去負責洗臉、卸妝、備料、清潔療程床等最耗時的環節，是控制人力成本最有效的方法。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(X)",
+      analysis: `師徒制分工應由助理分擔低技術耗時工作，讓高時薪的資深美容師專注於核心技術與關鍵諮詢，才能降低人事成本佔比。`
+    },
+    {
+      id: "q30", lecture: "第五講 美容院會員網站", type: "是非題", qNum: 6,
+      question: "在 Vibe Coding 的工作流裡，驗收時應該核對「需求是否被滿足」，而不是要求「長得和範例一模一樣」。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(O)",
+      analysis: `驗收核心在於個資同意、流水帳明細、預約狀態區分等實質業務邏輯是否達成，而非外觀像素的絕對一致。`
+    },
+
+    // --- 第六講 法律事務所網站 ---
+    {
+      id: "q31", lecture: "第六講 法律事務所網站", type: "選擇題", qNum: 1,
+      question: "收到傳票、心裡很慌的當事人點進法律事務所網站，前幾秒最希望感受到的是下列何者？",
+      options: [
+        { key: "(1)", text: "律師穿西裝、背後一整面法典書牆的氣派門面" },
+        { key: "(2)", text: "二十一項業務範圍清單，每項三個字" },
+        { key: "(3)", text: "有人聽得懂他現在的處境、知道下一步怎麼走" },
+        { key: "(4)", text: "律師的勝訴率與「找我一定贏」的承諾" }
+      ],
+      answerKey: "(3)",
+      analysis: `當事人買的是「將失眠夜晚交託給專業者」的安心感。他需要的是同理心與清晰行動方向，而非冷漠的裝飾或虛假的包贏承諾。`
+    },
+    {
+      id: "q32", lecture: "第六講 法律事務所網站", type: "選擇題", qNum: 2,
+      question: "依產業營運邏輯，下列關於律師事務所收入結構的敘述何者最正確？",
+      options: [
+        { key: "(1)", text: "訴訟委任是基礎收入，常年顧問費是機會收入" },
+        { key: "(2)", text: "律師靠常年顧問費活著，靠訴訟賺錢" },
+        { key: "(3)", text: "接的案子愈多愈好，案件數量決定一年的淨利" },
+        { key: "(4)", text: "合夥律師應親自完成所有書狀與卷宗整理才能保證品質" }
+      ],
+      answerKey: "(2)",
+      analysis: `常年法律顧問費覆蓋日常租金與助理底薪，支撐事務所運作；訴訟案酬勞則幾乎為純利，故稱「靠顧問費活著，靠訴訟賺錢」。`
+    },
+    {
+      id: "q33", lecture: "第六講 法律事務所網站", type: "選擇題", qNum: 3,
+      question: "梅爾等人（Mayer et al., 1995）提出的信任三支柱，正確的三個核心要素是下列何者？",
+      options: [
+        { key: "(1)", text: "資歷、勝訴率、媒體曝光" },
+        { key: "(2)", text: "能力、良善、誠信" },
+        { key: "(3)", text: "外表、年資、辦公室環境" },
+        { key: "(4)", text: "學歷、知名度、客戶數量" }
+      ],
+      answerKey: "(2)",
+      analysis: `經典信任模型三大支柱：能力（Ability，真才實學）、良善（Benevolence，以客為念）、誠信（Integrity，誠實言行合一）。`
+    },
+    {
+      id: "q34", lecture: "第六講 法律事務所網站", type: "選擇題", qNum: 4,
+      question: "下列哪一種寫法，最符合本講「法律網站資訊呈現的安全邊界」？",
+      options: [
+        { key: "(1)", text: "在法律文章裡直接判斷讀者的個案會輸還是會贏" },
+        { key: "(2)", text: "用案例暗示「您的情況也會有相同結果」" },
+        { key: "(3)", text: "費用說明寫成「保證全市最低價」吸引諮詢" },
+        { key: "(4)", text: "案例去識別化，只說明爭點與處理方向" }
+      ],
+      answerKey: "(4)",
+      analysis: `法律網站應維持在通則資訊層次，案例須去識別化並點明爭點；不可針對個別未委任讀者草率保證結果或承諾低價。`
+    },
+    {
+      id: "q35", lecture: "第六講 法律事務所網站", type: "是非題", qNum: 5,
+      question: "初談表單應該愈詳細愈好，欄位收得愈多、寫得愈像完整的法律分析，當事人就會覺得愈專業、愈值得信任。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(X)",
+      analysis: `初談表單僅需收集案件類型與利益衝突排查資訊；過度深入易使當事人誤以為未簽約已獲得正式法律見解，引發責任風險。`
+    },
+    {
+      id: "q36", lecture: "第六講 法律事務所網站", type: "是非題", qNum: 6,
+      question: "在 Vibe Coding 的工作流裡，重點是把業務需求、資料欄位、流程規則說清楚，再讓 AI 產出第一版。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(O)",
+      analysis: `清楚定義業務領域邏輯（如衝突檢核、委任關係界線），AI 才能寫出合乎真實法規結構的原型網站。`
+    },
+
+    // --- 第七講 餐廳訂位網站 ---
+    {
+      id: "q37", lecture: "第七講 餐廳訂位網站", type: "選擇題", qNum: 1,
+      question: "週五要帶未來岳父母上門的客人，在高價位訂位型餐廳訂位頁上最在意的其實是下列何者？",
+      options: [
+        { key: "(1)", text: "哪一道菜得過米其林星" },
+        { key: "(2)", text: "訂位送出後是否立刻確認、查得到，不會在門口被說「查不到您的預訂」" },
+        { key: "(3)", text: "餐廳的咖啡豆從哪裡進口" },
+        { key: "(4)", text: "廚房的坪數與設備清單" }
+      ],
+      answerKey: "(2)",
+      analysis: `重要聚餐客人買的是社交面子。最怕訂位失靈在現場遭遇尷尬，因此立即且可被查證的確認狀態是決策關鍵。`
+    },
+    {
+      id: "q38", lecture: "第七講 餐廳訂位網站", type: "選擇題", qNum: 2,
+      question: "餐飲管理學的「菜單工程」（Menu Engineering）把每道菜用哪兩個軸分成四象限？",
+      options: [
+        { key: "(1)", text: "食材產地與保存期限" },
+        { key: "(2)", text: "烹調難度與出餐速度" },
+        { key: "(3)", text: "受歡迎程度（點餐率）與利潤率" },
+        { key: "(4)", text: "售價高低與分量大小" }
+      ],
+      answerKey: "(3)",
+      analysis: `菜單工程以「受歡迎程度（點餐率）」與「利潤率」為座標軸，區分出明星、耕牛、問號、瘦狗四象限並作版面引導。`
+    },
+    {
+      id: "q39", lecture: "第七講 餐廳訂位網站", type: "選擇題", qNum: 3,
+      question: "根據本講介紹的「峰終定律」，客人事後對一頓飯的整體評價主要取決於下列何者？",
+      options: [
+        { key: "(1)", text: "整頓飯期間每一道菜的平均水準" },
+        { key: "(2)", text: "第一道開胃菜的驚豔程度" },
+        { key: "(3)", text: "體驗中最高峰的時刻，加上用餐結束那一刻的感受" },
+        { key: "(4)", text: "餐點價格與分量的性價比" }
+      ],
+      answerKey: "(3)",
+      analysis: `峰終定律（Peak-End Rule）：整體記憶主要由過程中的「最高峰感受」與「離開前最後一刻感受」決定，而非全期算術平均。`
+    },
+    {
+      id: "q40", lecture: "第七講 餐廳訂位網站", type: "選擇題", qNum: 4,
+      question: "下列何者最符合本講「不會讓人在十年後抬不起頭」的信任底線？",
+      options: [
+        { key: "(1)", text: "把快過期的生鮮用重口味醬料掩蓋後重新出餐" },
+        { key: "(2)", text: "僱用走路工排隊製造人龍，營造「很多人覺得值得等」的假象" },
+        { key: "(3)", text: "服務費與低消在訂位前、菜單顯眼處就清楚標示，客人選擇前就知道" },
+        { key: "(4)", text: "菜單頁尾用六號小字標「另收一成服務費」，等結帳才讓客人發現" }
+      ],
+      answerKey: "(3)",
+      analysis: `誠信原則要求：所有費用與低消規則在客人做出選擇前，即在顯眼處公開誠實告知，杜絕結帳突襲。`
+    },
+    {
+      id: "q41", lecture: "第七講 餐廳訂位網站", type: "是非題", qNum: 5,
+      question: "餐廳訂位系統只要在前端畫面把額滿時段做成灰色不可點，就足以防止超收，後端不必再檢查一次容量。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(X)",
+      analysis: `前端反灰無法防範多人併發同時點擊送出。真正防止超收必須仰賴後端系統進行排他性交易鎖定或二次容量檢核。`
+    },
+    {
+      id: "q42", lecture: "第七講 餐廳訂位網站", type: "是非題", qNum: 6,
+      question: "本講的「多座位並行管理」是指只要算出「同時段總共還剩幾個座位」就好，不必區分桌型。",
+      options: [
+        { key: "(O)", text: "正確 (O)" },
+        { key: "(X)", text: "錯誤 (X)" }
+      ],
+      answerKey: "(X)",
+      analysis: `座位是以桌型為單位分配。剩餘 4 位若為兩張不能併的雙人桌，無法接待 4 人客；必須以桌型實際可用性計算。`
+    }
+  ];
+
+  let quizHistory = {};
+  let wrongSet = new Set();
+  let quizLectureFilter = 'all';
+  let quizTypeFilter = 'all';
+  let quizSearchQuery = '';
+  let showWrongOnly = false;
+
+  function loadAppStorage() {
+    try {
+      const qHist = localStorage.getItem('web_quiz_history_v5');
+      if (qHist) quizHistory = JSON.parse(qHist);
+      const wSet = localStorage.getItem('web_quiz_wrong_v5');
+      if (wSet) wrongSet = new Set(JSON.parse(wSet));
+    } catch(e) {}
+  }
+
+  function saveAppStorage() {
+    try {
+      localStorage.setItem('web_quiz_history_v5', JSON.stringify(quizHistory));
+      localStorage.setItem('web_quiz_wrong_v5', JSON.stringify(Array.from(wrongSet)));
+    } catch(e) {}
+    updateQuizStats();
+  }
+
+  function resetQuizProgress() {
+    if (confirm('確定要清空所有選擇題的作答紀錄與錯題本嗎？')) {
+      quizHistory = {};
+      wrongSet.clear();
+      saveAppStorage();
+      renderQuizList();
+    }
+  }
+
+  function updateQuizStats() {
+    let answered = 0;
+    let correct = 0;
+    Object.keys(quizHistory).forEach(id => {
+      if (quizHistory[id]) {
+        answered++;
+        if (quizHistory[id].isCorrect) correct++;
+      }
+    });
+    const acc = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+    document.getElementById('stat-answered').innerText = answered;
+    document.getElementById('stat-accuracy').innerText = acc + '%';
+    document.getElementById('stat-wrong-count').innerText = wrongSet.size;
+    document.getElementById('wrong-filter-num').innerText = wrongSet.size;
+  }
+
+  function getFilteredQuizData() {
+    return quizData.filter(q => {
+      if (showWrongOnly && !wrongSet.has(q.id)) return false;
+      const matchLec = quizLectureFilter === 'all' || q.lecture === quizLectureFilter;
+      const matchT = quizTypeFilter === 'all' || q.type === quizTypeFilter;
+      let matchQ = true;
+      if (quizSearchQuery) {
+        const query = quizSearchQuery.toLowerCase();
+        const text = (q.lecture + q.question + q.options.map(o=>o.text).join(' ') + (q.analysis||'')).toLowerCase();
+        matchQ = text.includes(query);
+      }
+      return matchLec && matchT && matchQ;
+    });
+  }
+
+  function renderQuizList() {
+    const container = document.getElementById('quiz-container');
+    const items = getFilteredQuizData();
+
+    if (items.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:50px 20px; color:var(--text-muted); background:white; border-radius:14px; border:1px solid var(--border);">
+          ${showWrongOnly ? '🎉 太棒了！錯題本目前是空的，沒有任何錯題！' : '🎯 沒有符合篩選條件的題目，請放寬搜尋或講次條件。'}
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = items.map(q => {
+      const hist = quizHistory[q.id];
+      const hasAnswered = !!hist;
+      const isWrong = hist && !hist.isCorrect;
+      const isCorrect = hist && hist.isCorrect;
+      const inWrongBook = wrongSet.has(q.id);
+
+      let cardClass = 'quiz-card';
+      if (hasAnswered) cardClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+      if (inWrongBook) cardClass += ' is-in-wrongbook';
+
+      const optionsHtml = q.options.map(opt => {
+        let btnClass = 'opt-btn';
+        if (hasAnswered) {
+          btnClass += ' disabled';
+          if (opt.key === q.answerKey) btnClass += ' correct';
+          else if (hist.selectedKey === opt.key && !isCorrect) btnClass += ' wrong-picked';
+        }
+        return `
+          <button class="${btnClass}" onclick="handleOptionClick('${q.id}', '${opt.key}')">
+            <span class="opt-badge">${opt.key}</span>
+            <span>${opt.text}</span>
+          </button>
+        `;
+      }).join('');
+
+      let feedbackHtml = '';
+      if (hasAnswered) {
+        feedbackHtml = `
+          <div class="feedback-box ${isCorrect ? 'correct' : 'wrong'}" style="display:block;">
+            <div class="fb-title">
+              <span>${isCorrect ? '✅ 答對了！' : '❌ 答錯了！正確答案是：' + q.answerKey}</span>
+            </div>
+            <div class="fb-analysis">
+              <strong>💡 題目詳解：</strong><br>${q.analysis}
+            </div>
+          </div>
+        `;
+      }
+
+      let actionsHtml = '';
+      if (hasAnswered) {
+        actionsHtml = `
+          <div class="q-footer-actions">
+            ${inWrongBook ? `<button class="remove-wrong-btn" onclick="removeFromWrongbook('${q.id}')">✓ 從錯題本移除</button>` : ''}
+            <button class="retry-btn" onclick="retryQuestion('${q.id}')">🔄 重新作答此題</button>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="${cardClass}" id="card-${q.id}">
+          <div class="q-meta">
+            <span class="tag-lec">${q.lecture}</span>
+            <span class="tag-type">${q.type}</span>
+            <span class="tag-num">第 ${q.qNum} 題</span>
+            <span class="tag-wrong-badge">📕 錯題收錄</span>
+          </div>
+          <div class="q-text">${q.qNum}. ${q.question}</div>
+          <div class="options-grid">
+            ${optionsHtml}
+          </div>
+          ${feedbackHtml}
+          ${actionsHtml}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function handleOptionClick(qid, selectedKey) {
+    if (quizHistory[qid]) return;
+    const q = quizData.find(item => item.id === qid);
+    if (!q) return;
+    const isCorrect = (selectedKey === q.answerKey);
+    quizHistory[qid] = { selectedKey, isCorrect };
+    if (!isCorrect) wrongSet.add(qid);
+    saveAppStorage();
+    renderQuizList();
+  }
+
+  function retryQuestion(qid) {
+    delete quizHistory[qid];
+    saveAppStorage();
+    renderQuizList();
+  }
+
+  function removeFromWrongbook(qid) {
+    wrongSet.delete(qid);
+    saveAppStorage();
+    renderQuizList();
+  }
+
+  function toggleWrongbookOnly() {
+    showWrongOnly = !showWrongOnly;
+    const btn = document.getElementById('btn-wrongbook-toggle');
+    if (showWrongOnly) btn.classList.add('active');
+    else btn.classList.remove('active');
+    renderQuizList();
+  }
+
+  function setQuizLecture(lec, btn) {
+    quizLectureFilter = lec;
+    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderQuizList();
+  }
+
+  function setQuizType(t, btn) {
+    quizTypeFilter = t;
+    btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderQuizList();
+  }
+
+  function filterQuiz() {
+    quizSearchQuery = document.getElementById('quiz-search').value.trim();
+    renderQuizList();
+  }
+
+  loadAppStorage();
+  updateQuizStats();
+  renderQuizList();
+</script>
+</body>
+</html>
